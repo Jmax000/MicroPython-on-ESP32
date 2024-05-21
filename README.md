@@ -45,6 +45,16 @@ For me this command looked like this:
 
 `esptool.py --chip esp32 --port /dev/tty.usbserial-0001 --baud 460800 write_flash -z 0x1000 ESP32_GENERIC-20240222-v1.22.2.bin`
 
-##
+## Debugging
 
-[^1]: My reference https://medium.com/@andymule/micropython-on-esp32-e54998966e9
+THIS WORKS!!!! -> `screen /dev/cu.usbserial-0001 115200` (The baud rate is important! Idk why this specific one works but it does!
+```
+import uos
+print(uos.listdir())
+```
+`sudo ampy --port /dev/cu.usbserial-0001 run test.py`
+
+
+[^1]: https://medium.com/@andymule/micropython-on-esp32-e54998966e9
+[^2]: https://learn.sparkfun.com/tutorials/micropython-programming-tutorial-getting-started-with-the-esp32-thing/repl-hello-world
+[^3]: https://github.com/scientifichackers/ampy/issues/19?source=post_page-----fcef1370a2dd--------------------------------?source=post_page-----fcef1370a2dd--------------------------------#issuecomment-317126363
