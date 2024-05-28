@@ -45,7 +45,10 @@ For me this command looked like this:
 
 `esptool.py --chip esp32 --port /dev/tty.usbserial-0001 --baud 460800 write_flash -z 0x1000 ESP32_GENERIC-20240222-v1.22.2.bin`
 
-## Debugging
+## Troubleshooting
+- Make sure you have the correct drivers installed
+
+
 
 THIS WORKS!!!! -> `screen /dev/cu.usbserial-0001 115200` (The baud rate is important! Idk why this specific one works but it does!
 ```
