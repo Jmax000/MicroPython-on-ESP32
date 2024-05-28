@@ -44,7 +44,7 @@ For most people, the first upload won't work. It will give you this error:
 
  ![Figure 11](/Images/figure11.png)
 
- This is because for you to upload to your ESP, the device needs to enter "raw repl" mode. Without a `main.py` on the device, this should happen by default. The way your computer checks if the ESP has entered "raw repl" mode is by checking the output of your ESP. Normally in "raw repl" mode, you should see 3 arrows (`>>>`) to indicate that it is looking for input. However, most ESPs spit out some garbage values while they are rebooting so your computer doesn't see the 3 arrows and infers that the device isn't in "raw repl" mode. 
+ This is because for you to upload to your ESP, the device needs to enter "raw repl" mode. Without a `main.py` on the device, this should happen by default. The way your computer checks if the ESP has entered "raw repl" mode is by checking the output of your ESP. Normally in "raw repl" mode, you should see 3 arrows (`>>>`) to indicate that it is looking for input. However, most ESPs spit out some garbage values while they are rebooting so your computer first sees the garbage values instead of the 3 arrows and infers that the device isn't in "raw repl" mode. 
 
  To make sure this is your problem enter the following into your terminal (make sure to input the proper device path):
 
@@ -52,14 +52,38 @@ For most people, the first upload won't work. It will give you this error:
 screen <device path> 115200
 ```
 
-If this is your error you should see something similar to this:
+If this is your error you should see something similar to this (notice the garbage values before entering "raw repel" mode):
 
  ![Figure 12](/Images/figure12.png)
 
- 
- 
+ To fix this we need to give your ESP time to bootup before checking if it is in "raw repl" mode. To accomplish this, inside your project folder go into `.venv>lib>python3.9>site-packages>ampy>pyboard.py` or click on the last link in your error message (it should say pyboard.py at the very end of the link). Scroll down to the following code:
+ ```
+ n = self.serial.inWaiting()
+ while n > 0:
+     self.serial.read(n)
+     n = self.serial.inWaiting()
+```
+ After the while loop add this line of code:
+```
+time.sleep(2)
+```
+At the end, the whole section should look like this:
+```
+ n = self.serial.inWaiting()
+ while n > 0:
+     self.serial.read(n)
+     n = self.serial.inWaiting()
+ time.sleep(2)
+```
+Following this, when you flash your code you should no longer get this error message. If you still get this error you can increase the sleep time.
 
 ## Connect to your Device
+
+Once these steps are complete you can see your "Hellow World!" message by entering the following code into your terminal (make sure to input the proper device path):
+```
+screen <device path> 115200
+```
+ ![Figure 14](/Images/figure11.png)
 
 ## Troubleshooting
 
