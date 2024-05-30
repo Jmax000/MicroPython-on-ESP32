@@ -83,7 +83,7 @@ Once these steps are complete you can see your "Hellow World!" message by enteri
 ```
 screen <device path> 115200
 ```
- ![Figure 14](/Images/figure11.png)
+ ![Figure 14](/Images/figure14.png)
 
 ## Troubleshooting
 
