@@ -23,39 +23,53 @@ You can kind of think of micropython as the operating system on your ESP, so you
 
 Now that we have the installation on our local computer, we need to flash it to our ESP. To do this let’s navigate into the downloads folder inside the terminal. Open Terminal and type all the next lines into our command prompt:
 
-`cd Downloads/`
+```
+cd Downloads/
+```
 
 Use pip to download the Python tool that will flash our esp.
 
-`pip install esptool`
+```
+pip install esptool
+```
 
 From here we need to take off the existing firmware on the ESP with the following command (The ESP location is the same location that we found in the previous step):
 
-`esptool.py --chip esp32 --port [ESP location] erase_flash`
+```
+esptool.py --chip esp32 --port [ESP location] erase_flash
+```
 
 For me, this command looked like this: 
 
-`esptool.py --chip esp32 --port /dev/tty.usbserial-0001 erase_flash `
+```
+esptool.py --chip esp32 --port /dev/tty.usbserial-0001 erase_flash
+```
 
 Following this we can flash our installation of micropython by entering this into the command line: 
 
-`esptool.py --chip esp32 --port [ESP Location]--baud 460800 write_flash -z 0x1000 [Installation Name]`
+```
+esptool.py --chip esp32 --port [ESP Location]--baud 460800 write_flash -z 0x1000 [Installation Name]
+```
 
 For me this command looked like this:
 
-`esptool.py --chip esp32 --port /dev/tty.usbserial-0001 --baud 460800 write_flash -z 0x1000 ESP32_GENERIC-20240222-v1.22.2.bin`
+```
+esptool.py --chip esp32 --port /dev/tty.usbserial-0001 --baud 460800 write_flash -z 0x1000 ESP32_GENERIC-20240222-v1.22.2.bin
+```
 
 ## Troubleshooting
 - Make sure you have the correct drivers installed
 
 
 
-THIS WORKS!!!! -> `screen /dev/cu.usbserial-0001 115200` (The baud rate is important! Idk why this specific one works but it does!
+THIS WORKS!!!! -> ```screen /dev/cu.usbserial-0001 115200``` (The baud rate is important! Idk why this specific one works but it does!
 ```
 import uos
 print(uos.listdir())
 ```
-`sudo ampy --port /dev/cu.usbserial-0001 run test.py`
+```
+sudo ampy --port /dev/cu.usbserial-0001 run test.py
+```
 
 
 [^1]: https://medium.com/@andymule/micropython-on-esp32-e54998966e9
