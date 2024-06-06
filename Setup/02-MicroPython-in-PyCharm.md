@@ -87,5 +87,53 @@ screen <device path> 115200
 
 ## Troubleshooting
 
+```
+from machine import Pin
+import sys
+import time
+
+# Pin definitions
+repl_button = Pin(0, Pin.IN, Pin.PULL_UP)
+led_1 = Pin(14, Pin.OUT)
+# led_2 = Pin(27, Pin.OUT)
+# led_3 = Pin(26, Pin.OUT)
+# led_4 = Pin(25, Pin.OUT)
+# led_5 = Pin(32, Pin.OUT)
+
+# button_1 = Pin(4, Pin.IN, Pin.PULL_UP)
+# button_2 = Pin(16, Pin.IN, Pin.PULL_UP)
+# button_3 = Pin(17, Pin.IN, Pin.PULL_UP)
+# button_4 = Pin(5, Pin.IN, Pin.PULL_UP)
+# button_5 = Pin(18, Pin.IN, Pin.PULL_UP)
+
+button_1 = Pin(4, Pin.IN, Pin.PULL_DOWN)
+# button_2 = Pin(16, Pin.IN, Pin.PULL_DOWN)
+# button_3 = Pin(17, Pin.IN, Pin.PULL_DOWN)
+# button_4 = Pin(5, Pin.IN, Pin.PULL_DOWN)
+# button_5 = Pin(18, Pin.IN, Pin.PULL_DOWN)
+
+# Infinite Loop
+while True:
+    # If button 0 is pressed, drop to REPL
+    if repl_button.value() == 0:
+        print("Dropping to REPL")
+        sys.exit()
+
+    if button_1.value() == 1:
+        led_1.on()
+
+    # if button_2.value() == 0:
+    #     led_2.on()
+    #
+    # if button_3.value() == 0:
+    #     led_3.on()
+    #
+    # if button_4.value() == 0:
+    #     led_4.on()
+    #
+    # if button_5.value() == 0:
+    #     led_5.on()
+
+```
 
 [^1]: [https://medium.com/@andymule/micropython-on-esp32-e54998966e9](https://medium.com/@andymule/micropython-in-pycharms-basic-setup-9169b497ec8a)
