@@ -7,19 +7,19 @@ When you plug your ESP into your computer via USB, it needs to recognize the ser
 
 On MacOS, go into System Settings > General > About and scroll down to the bottom of that page and click on the “System Report…” button. From there go to the “USB” heading under “Hardware”. Here you should see your ESP connected to one of your USB connections. Take note of the “Serial Number” listed in the information provided. In my photo below, it’s “0001”. We will use this number to identify where our ESP is located in memory in the next step.
 
-![Figure 1](/Images/figure1.png)
+![Figure 1](/Images/figure01.png)
 
 ## Find the location of your ESP in memory
 
 On MacOS, go into Terminal and type ls /dev/tty.*. This will list all the USB connections on your device. Look for the USB connection with the specific serial port we noted last step. This is the location of your ESP in memory. Copy down this location as we will be needing it later
 
-![Figure 2](/Images/figure2.png)
+![Figure 2](/Images/figure02.png)
 
 ## Flash your ESP32 with MicroPython
 
 You can kind of think of micropython as the operating system on your ESP, so you have to install it before you can run any programs, etc… Head on over to https://micropython.org/download/esp32 and grab the latest release.
 
-![Figure 3](/Images/figure3.png)
+![Figure 3](/Images/figure03.png)
 
 Now that we have the installation on our local computer, we need to flash it to our ESP. To do this let’s navigate into the downloads folder inside the terminal. Open Terminal and type all the next lines into our command prompt:
 
