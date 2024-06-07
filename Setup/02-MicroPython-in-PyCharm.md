@@ -75,68 +75,22 @@ At the end, the whole section should look like this:
      n = self.serial.inWaiting()
  time.sleep(2)
 ```
-Following this, when you flash your code you should no longer get this error message. If you still get this error you can increase the sleep time.
+Following this, you should no longer get this error message when you flash your code. If you still get this error you can increase the sleep time.
 
 ## Connect to your Device
 
-Once these steps are complete you can see your "Hellow World!" message by entering the following code into your terminal (make sure to input the proper device path):
+Once these steps are complete you can see your "Hello World!" message by entering the following code into your terminal (make sure to input the proper device path):
 ```
 screen <device path> 115200
 ```
 
-You also can use “ Ctrl-A ” and “ K ” to kill the screen
+You also can use “ Ctrl-A ” and “ Ctrl-K ” to kill the screen
 
  ![Figure 14](/Images/figure14.png)
 
+As you can see we are getting the garbage values at the beginning, printing out "Hello World!" and then entering into "raw repl" mode signified by the three arrows `>>>`. This means we successfully flashed our code and ran it on the ESP32!
+
 ## Troubleshooting
 
-```
-from machine import Pin
-import sys
-import time
-
-# Pin definitions
-repl_button = Pin(0, Pin.IN, Pin.PULL_UP)
-led_1 = Pin(14, Pin.OUT)
-# led_2 = Pin(27, Pin.OUT)
-# led_3 = Pin(26, Pin.OUT)
-# led_4 = Pin(25, Pin.OUT)
-# led_5 = Pin(32, Pin.OUT)
-
-# button_1 = Pin(4, Pin.IN, Pin.PULL_UP)
-# button_2 = Pin(16, Pin.IN, Pin.PULL_UP)
-# button_3 = Pin(17, Pin.IN, Pin.PULL_UP)
-# button_4 = Pin(5, Pin.IN, Pin.PULL_UP)
-# button_5 = Pin(18, Pin.IN, Pin.PULL_UP)
-
-button_1 = Pin(4, Pin.IN, Pin.PULL_DOWN)
-# button_2 = Pin(16, Pin.IN, Pin.PULL_DOWN)
-# button_3 = Pin(17, Pin.IN, Pin.PULL_DOWN)
-# button_4 = Pin(5, Pin.IN, Pin.PULL_DOWN)
-# button_5 = Pin(18, Pin.IN, Pin.PULL_DOWN)
-
-# Infinite Loop
-while True:
-    # If button 0 is pressed, drop to REPL
-    if repl_button.value() == 0:
-        print("Dropping to REPL")
-        sys.exit()
-
-    if button_1.value() == 1:
-        led_1.on()
-
-    # if button_2.value() == 0:
-    #     led_2.on()
-    #
-    # if button_3.value() == 0:
-    #     led_3.on()
-    #
-    # if button_4.value() == 0:
-    #     led_4.on()
-    #
-    # if button_5.value() == 0:
-    #     led_5.on()
-
-```
 
 [^1]: [https://medium.com/@andymule/micropython-on-esp32-e54998966e9](https://medium.com/@andymule/micropython-in-pycharms-basic-setup-9169b497ec8a)
