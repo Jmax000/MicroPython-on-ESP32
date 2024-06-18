@@ -168,15 +168,17 @@ def RobotPerception():
     else:
         SensedLightLeft = Detection.NO
     if isButtonPushed(button_2):
+        SensedLightRight = Detection.YES
+    else:
+        SensedLightRight = Detection.NO
+    if isButtonPushed(button_4):
         SensedLightLeft = Detection.YES
     else:
         SensedLightLeft = Detection.NO
-
-
-    if "replaceMe": # Add code to sense if light is detected on the right
-        # Action when light IS detected on the right
+    if isButtonPushed(button_5):
+        SensedLightDown = Detection.YES
     else:
-        # Action when light is NOT detected on the right
+        SensedLightDown = Detection.NO
 
     # Add code to detect if light is up or down. Lab 2 milestone 3
 
@@ -202,7 +204,7 @@ def getPinVoltage(pin):
 # Function to determine if a button is pushed or not
 #####################################################################
 def isButtonPushed(button_pin):
-    if "replaceMe":  # Add code to determine if the voltage on the pin is high or low
+    if button_pin.value() == 0:
         return True
     else:
         return False
@@ -218,7 +220,7 @@ def isCollision():
     # the code for the sonar sensor will go in this function.
     # Until then, we will use a button to model the sensor.
 
-    if "replaceMe":  # Add code to detect if the collision button was pressed
+    if isButtonPushed(button_3):  # Add code to detect if the collision button was pressed
         return True
     else:
         return False
@@ -258,7 +260,9 @@ def fsmCollisionDetection():
         case 0:  # collision detected
             # There is an obstacle, stop the robot
             ActionCollision = Collision.ON  # Sets the action to turn on the collision LED
+
             '''Add code in milestone 2 to stop the robot's wheels - Hint: ActionRobotDrive = ________'''
+            ActionCollision = Drive.STOP
 
             # State transition logic
             if SensedCollision == Detection.NO:
@@ -267,10 +271,11 @@ def fsmCollisionDetection():
         case 1:  # no collision
             # There is no obstacle, drive the robot
             ActionCollision = Collision.OFF  # Sets action to turn off the collision LED
+
             fsmSteerRobot()  # Milestone 2
 
             # State transition logic
-            if "replaceMe":  # Add code to determine when you need to go back to state 0
+            if isCollision():  # Add code to determine when you need to go back to state 0
                 collisionDetectionState = 0  # if collision, go to collision state
 
         case _:  # error handling
@@ -285,8 +290,6 @@ def fsmSteerRobot():
     global steerRobotState
     global ActionRobotDrive
 
-    ''' Get rid of this whole line for milestone 2
-
     match steerRobotState:
         case 0:  # light is not detected
             ActionRobotDrive = Drive.STOP
@@ -299,34 +302,35 @@ def fsmSteerRobot():
 
         case 1:  # light is to the left of robot
             # The light is on the left, turn left
-            ActionRobotDrive = "replaceMe"  # Add appropriate variable to set the action to turn left
+            ActionRobotDrive = Drive.LEFT  # Add appropriate variable to set the action to turn left
 
             # State transition logic
-            if "replaceMe":  # Add code: If light is also to the right, the light is in front
-                "replaceMe"  # Add code to transition to the "light on left and right" state*
-                # if light is on right, then go straight
-            elif "replaceMe":  # Add code: no longer light to the left
-                "replaceMe"  # *Add transition code* 
-                # if light is not on left, go back to stop state
+            if SensedLightRight == Detection.YES:  # Add code: If light is also to the right, the light is in front
+                steerRobotState = 3 # if light is on right, then go straight
+            elif SensedLightLeft == Detection.NO:  # Add code: no longer light to the left
+                steerRobotState = 0 # if light is not on left, go back to stop state
 
         case 2:  # light is to the rig ht of robot
             # The light is on the right, turn right
-            "replaceMe"  # Add code to set the action
+            ActionRobotDrive = Drive.RIGHT  # Add code to set the action
 
             # State transition logic
-            "replaceMe"  # Add code to transition to the "light on right and left" state
+            if SensedLightLeft == Detection.YES:  # Add code: If light is also to the right, the light is in front
+                steerRobotState = 3 # if light is on left, then go straight
+            elif SensedLightRight == Detection.NO:  # Add code: no longer light to the left
+                steerRobotState = 0 # if light is not on right, go back to stop state
 
         case 3:  # light is on both right and left
-            # Add Code: Add in a case 3 for when the light is on both the right and left
-            # Think about what actions you need to implement and
-            # what changes could occur that would cause a transition to another
-            # state. Don't forget the break statement at the end of the case.
-            "replaceMe"
+            ActionRobotDrive = Drive.STRAIGHT  # Add code to set the action
+
+            # State transition logic
+            if SensedLightLeft == Detection.NO:  # Add code: If light is also to the right, the light is in front
+                steerRobotState = 2  # if light is on left, then go straight
+            elif SensedLightRight == Detection.NO:  # Add code: no longer light to the left
+                steerRobotState = 1  # if light is not on right, go back to stop state
 
         case _: # error handling
             steerRobotState = 0
-
-    Get rid of this whole line for milestone 2 '''
 
 
 #####################################################################
@@ -335,6 +339,7 @@ def fsmSteerRobot():
 #####################################################################
 def fsmMoveServoUpAndDown():
     global moveServoState
+    global ActionServoMove
 
     # Milestone 3
     # Create a state machine modeled after the ones in milestones 1 and 2
@@ -342,6 +347,39 @@ def fsmMoveServoUpAndDown():
     # Remember no light or light in front = servo doesn't move
     # Light above = servo moves up
     # Light below = servo moves down
+
+    match moveServoState:
+        case 0: # light is not detected
+            ActionServoMove = ServoMove.STOP
+
+            # State transition logic
+            if SensedLightUp == Detection.YES and SensedLightDown == Detection.NO:
+                moveServoState = 1 # if light is above the robot and not below, go to up state
+            elif SensedLightUp == Detection.NO and SensedLightDown == Detection.YES:
+                moveServoState = 2 # if light is below the robot and not above, go to down state
+
+        case 1: # light is to the above of robot
+            # The light is above, move up
+            ActionServoMove = ServoMove.UP
+
+            # State transition logic
+            if SensedLightDown == Detection.YES:
+                moveServoState = 0 # if light is on above and below, go back to stop state
+            elif SensedLightUp == Detection.NO:
+                moveServoState = 0 # if light is below, move down
+
+        case 2: # light is below the robot
+            # The light is below, move down
+            ActionServoMove = ServoMove.DOWN
+
+            # State transition logic
+            if SensedLightUp == Detection.YES:
+                moveServoState = 0 # if light is on above and below, go back to stop state
+            elif SensedLightDown == Detection.NO:
+                moveServoState = 0 # if light is not below, go back to stop state
+
+        case _:
+            moveServoState = 0
 
 
 #####################################################################
@@ -374,20 +412,23 @@ def RobotAction():
     # This turns the collision LED on and off
     match ActionCollision:
         case Collision.OFF:
-            led_3.off()  # Collision LED off
+            led_3.off()
         case Collision.ON:
-            ''' Add code to turn the collision LED on. This would be LED_3 '''
+            led_3.on()
 
     match ActionRobotDrive:
         case Drive.STOP:
-            ''' Add code in milestone 2 to turn off both left and right motors (LEDs right now). '''
-            ''' DON'T FORGET TO USE YOUR LED VARIABLES AND NOT YOUR BUTTON VARIABLES FOR THIS!!! '''
+            led_2.off()
+            led_4.off()
         case Drive.LEFT:
-            ''' Add code in milestone 2 to turn off the right and on the left LEDs '''
+            led_4.off()
+            led_2.on()
         case Drive.RIGHT:
-            ''' Add code in milestone 2 '''
+            led_2.off()
+            led_4.on()
         case Drive.STRAIGHT:
-            ''' Add code in milestone 2 '''
+            led_2.on()
+            led_4.on()
 
     # This calls a function to move the servo
     MoveServo()
@@ -404,11 +445,14 @@ def MoveServo():
     # /* Add CurrentServoAngle in lab 6 */
     match ActionServoMove:
         case ServoMove.STOP:
-            "replaceMe"  # Add code in milestone 3
+            led_1.off()
+            led_5.off()
         case ServoMove.UP:
-            "replaceMe"  # Add code in milestone 3
+            led_1.on()
+            led_5.off()
         case ServoMove.DOWN:
-            "replaceMe"  # Add code in milestone 3
+            led_5.on()
+            led_1.off()
 
 
 '''################################################################################################

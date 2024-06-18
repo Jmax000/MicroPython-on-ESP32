@@ -164,9 +164,9 @@ def RobotPerception():
     ''' Delete this whole line for milestone 2
 
     if isButtonPushed(button_2):
-        SensedLightLeft = Detection.NO
-    else:
         SensedLightLeft = Detection.YES
+    else:
+        SensedLightLeft = Detection.NO
 
     # Remember, you can find the buttons and which one goes to what towards the top of the file
 
