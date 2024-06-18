@@ -31,6 +31,7 @@ import sys
 
 # IMPORTANT DO NOT CHANGE
 repl_button = Pin(0, Pin.IN, Pin.PULL_UP)
+DebugStateOutput = False
 
 # LED pins
 led_1 = Pin(14, Pin.OUT)
@@ -466,8 +467,23 @@ while True:
         print("Dropping to REPL")
         sys.exit()
 
-    # DebugStateOutput = False
+    # DebugStateOutput = True FIXME
 
     RobotPerception()
+    if DebugStateOutput:
+        print("Perception:")
+        print(SensedLightUp)
+        print(SensedLightRight)
+        print(SensedLightLeft)
+        print(SensedLightDown)
+        # print(SensedCapacitiveTouch) # Lab 4
+
     RobotPlanning()
+    if DebugStateOutput:
+        print("Action:")
+        print(ActionCollision)
+        print(ActionRobotDrive)
+        print(ActionServoMove)
+        # print(ActionRobotSpeed) # Lab 4
+
     RobotAction()
