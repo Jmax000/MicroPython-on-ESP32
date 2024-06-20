@@ -18,11 +18,11 @@
   2.0.0       07 June 2024      Creation by Jacob Ackroyd translating 2023 version into MircoPython
 
 ################################################################################################"""
+import time
 
 # These initial includes allow you to use necessary libraries for your sensors and servos.
 import machine
 from machine import Pin
-from enum import Enum
 import sys
 
 ###################################################################################################
@@ -87,33 +87,29 @@ BUTTON_THRESHOLD = 2.5
 ###################################################################################################
 # Definitions that allow one to set states
 # Sensor state definitions
-class Detection(Enum):
-    NO = 0
-    YES = 1
+DETECTION_NO = 0
+DETECTION_YES = 1
 
 
 # Motor speed definitions - Lab 4
 
 
 # Collision definitions
-class Collision(Enum):
-    ON = 0
-    OFF = 1
+COLLISION_ON = 0
+COLLISION_OFF = 1
 
 
 # Driving direction definitions
-class Drive(Enum):
-    STOP = 0
-    LEFT = 1
-    RIGHT = 2
-    STRAIGHT = 3
+DRIVE_STOP = 0
+DRIVE_LEFT = 1
+DRIVE_RIGHT = 2
+DRIVE_STRAIGHT = 3
 
 
 # Servo movement definitions
-class ServoMove(Enum):
-    STOP = 0
-    UP = 1
-    DOWN = 2
+SERVO_MOVE_STOP = 0
+SERVO_MOVE_UP = 1
+SERVO_MOVE_DOWN = 2
 
 
 ###################################################################################################
@@ -125,13 +121,13 @@ steerRobotState = 0
 moveServoState = 0
 
 # Collision (using Definitions)
-SensedCollision = Detection.NO
+SensedCollision = DETECTION_NO
 
 # Photodiode inputs (using Definitions) - The button represent the photodiodes for lab 2
-SensedLightRight = Detection.NO
-SensedLightLeft = Detection.NO
-SensedLightUp = Detection.NO
-SensedLightDown = Detection.NO
+SensedLightUp = DETECTION_NO
+SensedLightRight = DETECTION_NO
+SensedLightLeft = DETECTION_NO
+SensedLightDown = DETECTION_NO
 
 # Capacitive sensor input (using Definitions) - Lab 4
 # SensedCapacitiveTouch = DETECTION_NO;
@@ -140,14 +136,14 @@ SensedLightDown = Detection.NO
 # Global variables that define ACTION and initialization
 
 # Collision Actions (using Definitions)
-ActionCollision = Collision.OFF
+ActionCollision = COLLISION_OFF
 
 # Main motors Action (using Definitions)
-ActionRobotDrive = Drive.STOP
+ActionRobotDrive = DRIVE_STOP
 # Add speed action in Lab 4
 
 # Servo Action (using Definitions)
-ActionServoMove = ServoMove.STOP
+ActionServoMove = SERVO_MOVE_STOP
 
 '''################################################################################################
     Robot PERCEPTION - all of the sensing
@@ -158,28 +154,28 @@ def RobotPerception():
     # This function polls all the sensors and then assigns sensor outputs
     # that can be used by the robot in subsequent stages
     global SensedLightUp
-    global SensedLightDown
     global SensedLightRight
     global SensedLightLeft
+    global SensedLightDown
     global SensedCollision
 
     # Photodiode Sensing
     if isButtonPushed(button_1):
-        SensedLightUp = Detection.YES
+        SensedLightUp = DETECTION_YES
     else:
-        SensedLightLeft = Detection.NO
+        SensedLightUp = DETECTION_NO
     if isButtonPushed(button_2):
-        SensedLightRight = Detection.YES
+        SensedLightRight = DETECTION_YES
     else:
-        SensedLightRight = Detection.NO
+        SensedLightRight = DETECTION_NO
     if isButtonPushed(button_4):
-        SensedLightLeft = Detection.YES
+        SensedLightLeft = DETECTION_YES
     else:
-        SensedLightLeft = Detection.NO
+        SensedLightLeft = DETECTION_NO
     if isButtonPushed(button_5):
-        SensedLightDown = Detection.YES
+        SensedLightDown = DETECTION_YES
     else:
-        SensedLightDown = Detection.NO
+        SensedLightDown = DETECTION_NO
 
     # Add code to detect if light is up or down. Lab 2 milestone 3
 
@@ -188,9 +184,9 @@ def RobotPerception():
 
     # Collision Sensor
     if isCollision():
-        SensedCollision = Detection.YES
+        SensedCollision = DETECTION_YES
     else:
-        SensedCollision = Detection.NO
+        SensedCollision = DETECTION_NO
 
 
 #####################################################################
@@ -205,7 +201,7 @@ def getPinVoltage(pin):
 # Function to determine if a button is pushed or not
 #####################################################################
 def isButtonPushed(button_pin):
-    if button_pin.value() == 0:
+    if button_pin.value() == 1:
         return True
     else:
         return False
@@ -255,32 +251,32 @@ def RobotPlanning():
 #####################################################################
 def fsmCollisionDetection():
     global ActionCollision
+    global ActionRobotDrive
     global collisionDetectionState
 
-    match collisionDetectionState:
-        case 0:  # collision detected
-            # There is an obstacle, stop the robot
-            ActionCollision = Collision.ON  # Sets the action to turn on the collision LED
+    if collisionDetectionState == 0:  # collision detected
+        # There is an obstacle, stop the robot
+        ActionCollision = COLLISION_ON  # Sets the action to turn on the collision LED
 
-            '''Add code in milestone 2 to stop the robot's wheels - Hint: ActionRobotDrive = ________'''
-            ActionCollision = Drive.STOP
+        '''Add code in milestone 2 to stop the robot's wheels - Hint: ActionRobotDrive = ________'''
+        ActionRobotDrive = DRIVE_STOP
 
-            # State transition logic
-            if SensedCollision == Detection.NO:
-                collisionDetectionState = 1
+        # State transition logic
+        if SensedCollision == DETECTION_NO:
+            collisionDetectionState = 1
 
-        case 1:  # no collision
-            # There is no obstacle, drive the robot
-            ActionCollision = Collision.OFF  # Sets action to turn off the collision LED
+    elif collisionDetectionState == 1:  # no collision
+        # There is no obstacle, drive the robot
+        ActionCollision = COLLISION_OFF  # Sets action to turn off the collision LED
 
-            fsmSteerRobot()  # Milestone 2
+        fsmSteerRobot()  # Milestone 2
 
-            # State transition logic
-            if isCollision():  # Add code to determine when you need to go back to state 0
-                collisionDetectionState = 0  # if collision, go to collision state
+        # State transition logic
+        if isCollision():  # Add code to determine when you need to go back to state 0
+            collisionDetectionState = 0  # if collision, go to collision state
 
-        case _:  # error handling
-            collisionDetectionState = 0
+    else:  # error handling
+        collisionDetectionState = 0
 
 
 #####################################################################
@@ -291,47 +287,46 @@ def fsmSteerRobot():
     global steerRobotState
     global ActionRobotDrive
 
-    match steerRobotState:
-        case 0:  # light is not detected
-            ActionRobotDrive = Drive.STOP
+    if steerRobotState == 0:  # light is not detected
+        ActionRobotDrive = DRIVE_STOP
 
-            # State transition logic
-            if SensedLightLeft == Detection.YES:
-                steerRobotState = 1  # if light on left of robot, go to left state
-            elif SensedLightRight == Detection.YES:
-                steerRobotState = 2  # if light on right of robot, go to right state
+        # State transition logic
+        if SensedLightLeft == DETECTION_YES:
+            steerRobotState = 1  # if light on left of robot, go to left state
+        elif SensedLightRight == DETECTION_YES:
+            steerRobotState = 2  # if light on right of robot, go to right state
 
-        case 1:  # light is to the left of robot
-            # The light is on the left, turn left
-            ActionRobotDrive = Drive.LEFT  # Add appropriate variable to set the action to turn left
+    elif steerRobotState == 1:  # light is to the left of robot
+        # The light is on the left, turn left
+        ActionRobotDrive = DRIVE_LEFT  # Add appropriate variable to set the action to turn left
 
-            # State transition logic
-            if SensedLightRight == Detection.YES:  # Add code: If light is also to the right, the light is in front
-                steerRobotState = 3 # if light is on right, then go straight
-            elif SensedLightLeft == Detection.NO:  # Add code: no longer light to the left
-                steerRobotState = 0 # if light is not on left, go back to stop state
+        # State transition logic
+        if SensedLightRight == DETECTION_YES:  # Add code: If light is also to the right, the light is in front
+            steerRobotState = 3  # if light is on right, then go straight
+        elif SensedLightLeft == DETECTION_NO:  # Add code: no longer light to the left
+            steerRobotState = 0  # if light is not on left, go back to stop state
 
-        case 2:  # light is to the rig ht of robot
-            # The light is on the right, turn right
-            ActionRobotDrive = Drive.RIGHT  # Add code to set the action
+    elif steerRobotState == 2:  # light is to the rig ht of robot
+        # The light is on the right, turn right
+        ActionRobotDrive = DRIVE_RIGHT  # Add code to set the action
 
-            # State transition logic
-            if SensedLightLeft == Detection.YES:  # Add code: If light is also to the right, the light is in front
-                steerRobotState = 3 # if light is on left, then go straight
-            elif SensedLightRight == Detection.NO:  # Add code: no longer light to the left
-                steerRobotState = 0 # if light is not on right, go back to stop state
+        # State transition logic
+        if SensedLightLeft == DETECTION_YES:  # Add code: If light is also to the right, the light is in front
+            steerRobotState = 3  # if light is on left, then go straight
+        elif SensedLightRight == DETECTION_NO:  # Add code: no longer light to the left
+            steerRobotState = 0  # if light is not on right, go back to stop state
 
-        case 3:  # light is on both right and left
-            ActionRobotDrive = Drive.STRAIGHT  # Add code to set the action
+    elif steerRobotState == 3:  # light is on both right and left
+        ActionRobotDrive = DRIVE_STRAIGHT  # Add code to set the action
 
-            # State transition logic
-            if SensedLightLeft == Detection.NO:  # Add code: If light is also to the right, the light is in front
-                steerRobotState = 2  # if light is on left, then go straight
-            elif SensedLightRight == Detection.NO:  # Add code: no longer light to the left
-                steerRobotState = 1  # if light is not on right, go back to stop state
+        # State transition logic
+        if SensedLightLeft == DETECTION_NO:  # Add code: If light is also to the right, the light is in front
+            steerRobotState = 2  # if light is on left, then go straight
+        elif SensedLightRight == DETECTION_NO:  # Add code: no longer light to the left
+            steerRobotState = 1  # if light is not on right, go back to stop state
 
-        case _: # error handling
-            steerRobotState = 0
+    else:  # error handling
+        steerRobotState = 0
 
 
 #####################################################################
@@ -349,38 +344,37 @@ def fsmMoveServoUpAndDown():
     # Light above = servo moves up
     # Light below = servo moves down
 
-    match moveServoState:
-        case 0: # light is not detected
-            ActionServoMove = ServoMove.STOP
+    if moveServoState == 0:  # light is not detected
+        ActionServoMove = SERVO_MOVE_STOP
 
-            # State transition logic
-            if SensedLightUp == Detection.YES and SensedLightDown == Detection.NO:
-                moveServoState = 1 # if light is above the robot and not below, go to up state
-            elif SensedLightUp == Detection.NO and SensedLightDown == Detection.YES:
-                moveServoState = 2 # if light is below the robot and not above, go to down state
+        # State transition logic
+        if SensedLightUp == DETECTION_YES and SensedLightDown == DETECTION_NO:
+            moveServoState = 1  # if light is above the robot and not below, go to up state
+        elif SensedLightUp == DETECTION_NO and SensedLightDown == DETECTION_YES:
+            moveServoState = 2  # if light is below the robot and not above, go to down state
 
-        case 1: # light is to the above of robot
-            # The light is above, move up
-            ActionServoMove = ServoMove.UP
+    elif moveServoState == 1:  # light is to the above of robot
+        # The light is above, move up
+        ActionServoMove = SERVO_MOVE_UP
 
-            # State transition logic
-            if SensedLightDown == Detection.YES:
-                moveServoState = 0 # if light is on above and below, go back to stop state
-            elif SensedLightUp == Detection.NO:
-                moveServoState = 0 # if light is below, move down
+        # State transition logic
+        if SensedLightDown == DETECTION_YES:
+            moveServoState = 0  # if light is on above and below, go back to stop state
+        elif SensedLightUp == DETECTION_NO:
+            moveServoState = 0  # if light is below, move down
 
-        case 2: # light is below the robot
-            # The light is below, move down
-            ActionServoMove = ServoMove.DOWN
+    elif moveServoState == 2:  # light is below the robot
+        # The light is below, move down
+        ActionServoMove = SERVO_MOVE_DOWN
 
-            # State transition logic
-            if SensedLightUp == Detection.YES:
-                moveServoState = 0 # if light is on above and below, go back to stop state
-            elif SensedLightDown == Detection.NO:
-                moveServoState = 0 # if light is not below, go back to stop state
+        # State transition logic
+        if SensedLightUp == DETECTION_YES:
+            moveServoState = 0  # if light is on above and below, go back to stop state
+        elif SensedLightDown == DETECTION_NO:
+            moveServoState = 0  # if light is not below, go back to stop state
 
-        case _:
-            moveServoState = 0
+    else:
+        moveServoState = 0
 
 
 #####################################################################
@@ -411,25 +405,23 @@ def RobotAction():
     global ActionRobotDrive
 
     # This turns the collision LED on and off
-    match ActionCollision:
-        case Collision.OFF:
-            led_3.off()
-        case Collision.ON:
-            led_3.on()
+    if ActionCollision == COLLISION_OFF:
+        led_3.off()
+    elif ActionCollision == COLLISION_ON:
+        led_3.on()
 
-    match ActionRobotDrive:
-        case Drive.STOP:
-            led_2.off()
-            led_4.off()
-        case Drive.LEFT:
-            led_4.off()
-            led_2.on()
-        case Drive.RIGHT:
-            led_2.off()
-            led_4.on()
-        case Drive.STRAIGHT:
-            led_2.on()
-            led_4.on()
+    if ActionRobotDrive == DRIVE_STOP:
+        led_2.off()
+        led_4.off()
+    if ActionRobotDrive == DRIVE_LEFT:
+        led_4.off()
+        led_2.on()
+    if ActionRobotDrive == DRIVE_RIGHT:
+        led_2.off()
+        led_4.on()
+    if ActionRobotDrive == DRIVE_STRAIGHT:
+        led_2.on()
+        led_4.on()
 
     # This calls a function to move the servo
     MoveServo()
@@ -444,37 +436,35 @@ def MoveServo():
     # Note that there needs to be some logic in the action of moving
     # the servo so that it does not exceed its range
     # /* Add CurrentServoAngle in lab 6 */
-    match ActionServoMove:
-        case ServoMove.STOP:
-            led_1.off()
-            led_5.off()
-        case ServoMove.UP:
-            led_1.on()
-            led_5.off()
-        case ServoMove.DOWN:
-            led_5.on()
-            led_1.off()
+    if ActionServoMove == SERVO_MOVE_STOP:
+        led_1.off()
+        led_5.off()
+    elif ActionServoMove == SERVO_MOVE_UP:
+        led_1.on()
+        led_5.off()
+    elif ActionServoMove == SERVO_MOVE_DOWN:
+        led_5.on()
+        led_1.off()
 
 
 '''################################################################################################
     Main LOOP function - this gets executed in an infinite loop until power off or reset. 
     - Notice: PERCEPTION, PLANNING, ACTION
 ################################################################################################'''
-
 while True:
     # If button 0 is pressed, drop to REPL
     if repl_button.value() == 0:
         print("Dropping to REPL")
         sys.exit()
 
-    print("HIT")
-    DebugStateOutput = True
+    # DebugStateOutput = True
 
     RobotPerception()
     if DebugStateOutput:
         print("Perception:")
         print(SensedLightUp)
         print(SensedLightRight)
+        print(SensedCollision)
         print(SensedLightLeft)
         print(SensedLightDown)
         # print(SensedCapacitiveTouch) # Lab 4
